@@ -40,20 +40,9 @@ Next, we’ll create a shared folder where the Docker container will store the a
    ```
    meteo-docker
    ```
-4. Inside this folder, you’ll upload your **Dockerfile** and other necessary files.  
+4. **Upload** the `Dockerfile` and any other required files (e.g., your MeteoNook project files) into this folder.  
 
-Since Synology **does not have `nano` by default**, you **must** create the `Dockerfile` on your PC first and upload it via **File Station**.  
-
-Here’s the `Dockerfile` you need to create on your computer:  
-
-```dockerfile
-FROM php:8.2-cli
-WORKDIR /app
-EXPOSE 1337
-CMD ["php", "-S", "0.0.0.0:1337", "-t", "/app"]
-```
-
-Once saved, upload it to the `/volumeUSB1/usbshare/meteo-docker/` folder.  
+Now the `Dockerfile` is ready for use. ✅  
 
 ---
 
@@ -190,6 +179,6 @@ If you see the MeteoNook interface, everything is working! 🎉
 
 Congrats! 🎊 Your MeteoNook app is now running on your Synology NAS. You can now use it to predict the weather in **Animal Crossing: New Horizons**! 🌦️  
 
-If you run into any issues, feel free to ask for help! 🚀😊 I will try my best to answer 
+If you run into any issues, feel free to ask for help! 🚀😊  I will try my best to help 
 
 ---
