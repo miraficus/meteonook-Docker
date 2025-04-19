@@ -1,184 +1,122 @@
----
+# 🌦️ Meteonook Docker
 
-# 🚀 **MeteoNook Docker Setup Guide for Synology NAS**  
-
-Welcome to the **MeteoNook Docker Setup Guide**! This guide will walk you through setting up MeteoNook on your **Synology NAS** using Docker. Even if you’re new to Docker or Synology, don’t worry—I’ve got you covered! Let’s get started. 💻✨  
+Meteonook is a simple weather web app designed to display real-time local weather data using data pulled from Home Assistant. This repository provides a Dockerized version to run Meteonook on your **Synology NAS** or any Docker-compatible system.
 
 ---
 
-## 🌟 **What is MeteoNook?**  
+## 📦 Features
 
-MeteoNook is a weather prediction tool for **Animal Crossing: New Horizons**. 🎮🌦️ It helps you predict the weather patterns in your game based on seed values.  
-
-Here are the sources used for this project:  
-
-- **MeteoNook source code**: [https://github.com/Treeki/MeteoNook](https://github.com/Treeki/MeteoNook)  
-- **Tonky MeteoNook fork**: [https://github.com/herpiko/tonky-meteonook](https://github.com/herpiko/tonky-meteonook)  
-- **Commit version related to this build**: [a7ea07aa9b3db8859b0f476c549a1a2245ad1b07](https://github.com/Treeki/MeteoNook/commit/a7ea07aa9b3db8859b0f476c549a1a2245ad1b07)  
+- Easy deployment with Docker
+- Persistent storage
+- Customizable storage location
+- Custom port configuration
+- Works great on Synology NAS
 
 ---
 
-## 🏗️ **Step 1: Install Docker on Synology NAS**  
+## 🚀 Quick Start
 
-First, let’s install **Container Manager** (Docker) on your NAS:  
-
-1. Open **Package Center** in your Synology DSM web interface.  
-2. Search for **Container Manager** (this replaces the old Docker package).  
-3. Click **Install** and wait for the installation to complete.  
-
-Once installed, you’re ready to set up your project! 🚀  
-
----
-
-## 📂 **Step 2: Create a Folder for MeteoNook**  
-
-Next, we’ll create a shared folder where the Docker container will store the app files:  
-
-1. Open **File Station** on your Synology NAS.  
-2. Navigate to your **USB drive** (or another storage location).  
-3. Click **Create** → **Create New Folder** and name it something like:  
-   ```
-   meteo-docker
-   ```
-4. **Upload** the `Dockerfile` and any other required files (e.g., your MeteoNook project files) into this folder.  
-
-Now the `Dockerfile` is ready for use. ✅  
-
----
-
-## 🔑 **Step 3: Enable SSH & Access the Terminal**  
-
-Now, we need to access the NAS terminal via **SSH** to run the Docker commands:  
-
-### ✅ **Enable SSH on Synology NAS**  
-
-1. Open **Control Panel** on your NAS.  
-2. Go to **Terminal & SNMP** → **Terminal** tab.  
-3. Check **Enable SSH service** and click **Apply**.  
-
-### 🔌 **Connect to Your NAS via SSH**  
-
-1. Open a terminal (on Mac/Linux) or use **PuTTY** (on Windows).  
-2. Connect to your NAS by running:  
-
-   ```bash
-   ssh admin@your-nas-ip
-   ```
-
-   Replace `your-nas-ip` with the actual IP address of your NAS.  
-3. Enter your **admin password** when prompted.  
-
-Now you have terminal access to your NAS! 🎉  
-
----
-
-## 🔨 **Step 4: Build and Run the Docker Container**  
-
-Now that SSH is set up, we can build and run the container. **Since Synology requires `sudo`,** you must add `sudo` before every command.  
-
-### 🧱 **Build the Docker Image**  
-
-Navigate to the folder where you uploaded your `Dockerfile`:  
+To get started quickly with default settings:
 
 ```bash
-cd /volumeUSB1/usbshare/meteo-docker
-```
-
-Then build the image:  
-
-```bash
-sudo docker build -t meteonook-usb .
-```
-
-### 🚀 **Run the Docker Container**  
-
-Now, run the container in detached mode:  
-
-```bash
-sudo docker run -d \
+docker run -d \
+  --name meteonook \
   -p 1337:1337 \
-  -v /volumeUSB1/usbshare/meteo-docker:/app \
-  --name meteonook-usb-app \
-  meteonook-usb
+  -v /volumeUSB1/usbshare/meteo-docker:/app/data \
+  rfkgaming89/meteonook
 ```
 
-This starts the container **in the background** and maps port `1337`.  
-
 ---
 
-## 🖥️ **Step 5: Set Up via Synology’s GUI (Optional)**  
+## 🛠️ Customizing Your Setup
 
-If you prefer using the Synology **Container Manager** instead of SSH, follow these steps:  
+### 🔧 1. Change Where the Files Are Stored
 
-1. Open **Container Manager** on DSM.  
-2. Go to **Container** → Click **Create** → **Select Image**.  
-3. Choose the **meteonook-usb** image that you built earlier.  
-4. In **Volume Settings**:  
-   - Mount path: `/app`  
-   - Host path: `/volumeUSB1/usbshare/meteo-docker`  
-5. In **Port Settings**:  
-   - Local port: `1337`  
-   - Container port: `1337`  
-6. Click **Apply & Start**.  
+By default, Docker stores Meteonook data in:
 
-Your app should now be running! 🎉  
+```
+/volumeUSB1/usbshare/meteo-docker
+```
 
----
+To store data somewhere else (like another volume or folder):
 
-## ✅ **Step 6: Verify Everything is Working**  
+#### 🖱️ If you're using Synology GUI:
 
-Let’s check if the container is running correctly.  
+1. **Open File Station** and go to the location where you want to store your data (e.g., `/volume1/docker/meteo-docker`).
+2. **Create a new folder** (e.g., `meteo-docker`).
+3. Ensure the Docker user has **read/write permissions** to the folder.
+4. When creating the container, update the **volume mapping** accordingly:
+   ```
+   /your/custom/path:/app/data
+   ```
 
-### 🏃 **Check Running Containers**  
+#### 🖥️ If using CLI:
+
+Change the `-v` flag like this:
 
 ```bash
-sudo docker ps
+-v /volume1/docker/meteo-docker:/app/data
 ```
 
-### 📂 **Verify Your Files Inside the Container**  
+---
+
+### 🌐 2. Change the Web Port
+
+By default, Meteonook runs on **port 1337** inside the container. You can change the external port to avoid conflicts with other services.
+
+For example, to run on **port 8123**, change the `-p` flag:
 
 ```bash
-sudo docker exec meteonook-usb-app ls -la /app
+-p 8123:1337
 ```
 
-### 🌍 **Open the App in Your Browser**  
+This means:
+- **8123** = external port (the one you access in your browser)
+- **1337** = internal port (used by the app inside the container)
 
-Go to:  
+You can now access Meteonook at:
 
 ```
-http://your-nas-ip:1337
+http://<your-nas-ip>:8123
 ```
 
-If you see the MeteoNook interface, everything is working! 🎉  
+> 🔒 Make sure the port you choose isn’t already in use by another service.
 
 ---
 
-## 💡 **Pro Tips & Troubleshooting**  
+## 📂 Example Full Docker Run (with custom path and port)
 
-- **Auto-restart the container on boot**:  
-
-  ```bash
-  sudo docker update --restart unless-stopped meteonook-usb-app
-  ```
-
-- **Check logs for debugging**:  
-
-  ```bash
-  sudo docker logs meteonook-usb-app
-  ```
-
-- **Fix file permissions if needed**:  
-
-  ```bash
-  sudo chmod -R 755 /volumeUSB1/usbshare/meteo-docker
-  ```
+```bash
+docker run -d \
+  --name meteonook \
+  -p 8123:1337 \
+  -v /volume1/docker/meteo-docker:/app/data \
+  rfkgaming89/meteonook
+```
 
 ---
 
-## 🎉 **You Did It!**  
+## 🧼 Stopping and Removing the Container
 
-Congrats! 🎊 Your MeteoNook app is now running on your Synology NAS. You can now use it to predict the weather in **Animal Crossing: New Horizons**! 🌦️  
+To stop the container:
 
-If you run into any issues, feel free to ask for help! 🚀😊  I will try my best to help 
+```bash
+docker stop meteonook
+```
+
+To remove the container:
+
+```bash
+docker rm meteonook
+```
 
 ---
+
+## 🙌 Credits
+
+Here are the sources used for this project:
+
+- MeteoNook original source code: [https://github.com/Treeki/MeteoNook](https://github.com/Treeki/MeteoNook)
+- Tonky MeteoNook fork: [https://github.com/herpiko/tonky-meteonook](https://github.com/herpiko/tonky-meteonook)
+- Commit version related to this build: [a7ea07aa9b3db8859b0f476c549a1a2245ad1b07](https://github.com/Treeki/MeteoNook/commit/a7ea07aa9b3db8859b0f476c549a1a2245ad1b07)
+
